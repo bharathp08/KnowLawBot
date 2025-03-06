@@ -13,6 +13,8 @@ genai.configure(api_key=api_key)
 try:
     model = genai.GenerativeModel('gemini-pro')
     test_response = model.generate_content("Test connection")
+    if not hasattr(test_response, 'text'):
+        raise Exception("Invalid model response")
     logging.info("Model initialized successfully")
 except Exception as e:
     logging.error(f"Model initialization failed: {str(e)}")
@@ -32,13 +34,22 @@ def ask():
 
         # Process legal questions
         try:
-            response = model.generate_content(
-                f"As an Indian legal expert, provide information about: {user_question}. Include relevant laws and penalties."
-            )
+            # Enhance the prompt for better context
+            legal_prompt = f"""As an Indian legal expert, explain:
+            1. What are the fines and penalties for {user_question}?
+            2. Which laws and sections apply?
+            3. What are the legal consequences?
+            Please provide specific details from Indian law."""
+            
+            response = model.generate_content(legal_prompt)
+            if not hasattr(response, 'text'):
+                raise Exception("Invalid response format")
+            
             return jsonify({'response': response.text})
+            
         except Exception as e:
             logging.error(f"Generation error: {str(e)}")
-            return jsonify({'error': 'Unable to process request'}), 503
+            return jsonify({'error': 'Unable to process request. Please try again.'}), 503
 
     except Exception as e:
         logging.error(f"Request error: {str(e)}")
