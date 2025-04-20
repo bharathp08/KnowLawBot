@@ -5,7 +5,7 @@ import logging
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 
-# Configure Gemini API
+# Configure  API
 api_key = 'AIzaSyAG_dEEY9pk4B2tHsPVaeX4uULqNvjatak'
 try:
     genai.configure(api_key=api_key)
